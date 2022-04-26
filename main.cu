@@ -22,22 +22,22 @@
 #define DTYPE float
 
 const int BATCH_NUM = 100;
-const int INPUT_H = 125;
+const int INPUT_H = 256;
 const int INPUT_W = 256;
-const int INPUT_C = 7;
+const int INPUT_C = 32;
 
-const int FILTER_H = 17;
-const int FILTER_W = 11;
+const int FILTER_H = 7;
+const int FILTER_W = 7;
 
-const int PAD_H = 2;
-const int PAD_W = 4;
+const int PAD_H = 1;
+const int PAD_W = 1;
 
-const int STRIDE_H = 5;
-const int STRIDE_W = 2;
+const int STRIDE_H = 1;
+const int STRIDE_W = 1;
 
 const int OUTPUT_H = (INPUT_H-FILTER_H+2*PAD_H)/STRIDE_H + 1;
 const int OUTPUT_W = (INPUT_W-FILTER_W+2*PAD_W)/STRIDE_W + 1;
-const int OUTPUT_C = 5;
+const int OUTPUT_C = 32;
 
 
 int main(void) {
@@ -47,8 +47,10 @@ int main(void) {
     printf("CUDA Convolution Operation Example\n");
     printf(" - Input size: [%d,%d,%d,%d], filter size: [%d,%d,%d,%d], pad: [%d,%d], stride: [%d,%d] -> output size: [%d,%d,%d,%d]\n",
             BATCH_NUM,INPUT_C,INPUT_H,INPUT_W, INPUT_C,OUTPUT_C,FILTER_H,FILTER_W, PAD_H,PAD_W, STRIDE_H,STRIDE_W, BATCH_NUM,OUTPUT_C,OUTPUT_H,OUTPUT_W);
-    printf(" - Size of input[%.3fGB], output[%.3fGB]: \n",
-            1.0f*sizeof(DTYPE)*BATCH_NUM*INPUT_C*INPUT_W*INPUT_H*1e-9, 1.0f*sizeof(DTYPE)*BATCH_NUM*OUTPUT_C*OUTPUT_W*OUTPUT_H*1e-9);        
+    printf(" - Size of input[%.3fGB], output[%.3fGB], col[%.3fGB]: \n",
+            1.0f*sizeof(DTYPE)*BATCH_NUM*INPUT_C*INPUT_W*INPUT_H*1e-9, 1.0f*sizeof(DTYPE)*BATCH_NUM*OUTPUT_C*OUTPUT_W*OUTPUT_H*1e-9,
+            sizeof(DTYPE)*BATCH_NUM*INPUT_C*FILTER_H*FILTER_W*OUTPUT_H*OUTPUT_W*1e-9
+        );        
     printf(" - Target algorithm: \n");
     printf("    - Naive implementation of Conv\n");
     printf("    - Im2Col implementation of Conv\n");

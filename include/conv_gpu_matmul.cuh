@@ -51,24 +51,54 @@ __global__ void __kernel_im2col(
 /****************************************************************************************
  * Device code for matmul
  ****************************************************************************************/
-template <typename T>
+template <typename T, int WARP_SIZE>
 __global__ void __kernel_conv_matmul(
     const T* A, const T* B, T* C,
     const int BATCH_NUM, const int M, const int K, const int N
 ) {
 
+
+    __shared__ float sA[WARP_SIZE][WARP_SIZE];
+    __shared__ float sB[WARP_SIZE][WARP_SIZE];
+    
+
     int batch = blockIdx.z * blockDim.z + threadIdx.z;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
     int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int sy = threadIdx.y;
+    int sx = threadIdx.x;
 
-    if (y<M && x<N) {
-        T sum = 0;
-        for (int k=0; k<K; k++) {
-            sum += A[y*K + k] * B[batch*K*N + k*N + x];
+
+    T sum = 0;
+    for (int t=0; t<K; t+=WARP_SIZE) {
+
+        //A
+        if (y<M && (sx+t)<K) {
+            sA[sy][sx] = A[y*K+(sx+t)];
+        } else {
+            sA[sy][sx] = 0;
         }
-        C[batch*M*N + y*N+x] = sum;
-    } 
 
+        //B
+        if (x<N && (sy+t)<K) {
+            sB[sy][sx] = B[batch*K*N + (sy+t)*N+x];
+        } else {
+            sB[sy][sx] = 0;
+        }
+
+        // sync
+        __syncthreads();
+        //matmul
+
+        for (int k=0; k<WARP_SIZE && k+t<K ; k++) {
+            sum += sA[sy][k]*sB[k][sx];
+        }
+        __syncthreads();
+    }
+    if (y<M && x<N) {
+        C[batch*M*N + y*N + x] = sum;
+    }
+    
 }
 
 
@@ -159,7 +189,7 @@ void conv_gpu_matmul(
     #endif
 
     // GPU kernel
-    __kernel_conv_matmul<<<dim_blocks_matmul, dim_threads_matmul>>> (d_filter, d_col, d_output, /*BATCH_NUM*/BATCH_NUM, /*M*/OUTPUT_C, /*K*/KERNEL, /*N*/OUTPUT);
+    __kernel_conv_matmul<T, WARP_SIZE><<<dim_blocks_matmul, dim_threads_matmul>>> (d_filter, d_col, d_output, /*BATCH_NUM*/BATCH_NUM, /*M*/OUTPUT_C, /*K*/KERNEL, /*N*/OUTPUT);
     cudaErrChk( cudaMemcpy(output.data(), d_output, sizeof(T)*BATCH_NUM*OUTPUT_C*OUTPUT, cudaMemcpyDeviceToHost) );
     cudaErrChk( cudaDeviceSynchronize() );
     cudaErrChk( cudaGetLastError() );
