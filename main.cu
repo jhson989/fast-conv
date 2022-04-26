@@ -21,9 +21,9 @@
 
 #define DTYPE float
 
-const int BATCH_NUM = 100;
-const int INPUT_H = 256;
-const int INPUT_W = 256;
+const int BATCH_NUM = 12;
+const int INPUT_H = 128;
+const int INPUT_W = 128;
 const int INPUT_C = 32;
 
 const int FILTER_H = 7;

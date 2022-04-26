@@ -43,7 +43,6 @@ __global__ void __kernel_im2col(
             }
         }
 
-
     }
 }
  
@@ -58,7 +57,7 @@ __global__ void __kernel_conv_matmul(
 ) {
 
 
-    __shared__ float sA[WARP_SIZE][WARP_SIZE];
+    __shared__ float sA[WARP_SIZE][WARP_SIZE+1];
     __shared__ float sB[WARP_SIZE][WARP_SIZE];
     
 
@@ -74,14 +73,14 @@ __global__ void __kernel_conv_matmul(
 
         //A
         if (y<M && (sx+t)<K) {
-            sA[sy][sx] = A[y*K+(sx+t)];
+            sA[sy][sx] = A[y*K + (sx+t)];
         } else {
             sA[sy][sx] = 0;
         }
 
         //B
         if (x<N && (sy+t)<K) {
-            sB[sy][sx] = B[batch*K*N + (sy+t)*N+x];
+            sB[sy][sx] = B[batch*K*N + (sy+t)*N + x];
         } else {
             sB[sy][sx] = 0;
         }
