@@ -13,7 +13,7 @@
 #include <helper.cuh>
 #include <conv_cpu.cuh>
 #include <conv_gpu_naive.cuh>
-#include <conv_gpu_im2col.cuh>
+#include <conv_gpu_matmul.cuh>
 
 /***************************************************************************
  * Problem configuration
@@ -21,23 +21,23 @@
 
 #define DTYPE float
 
-const int BATCH_NUM = 2;
-const int INPUT_H = 25;
-const int INPUT_W = 25;
-const int INPUT_C = 8;
+const int BATCH_NUM = 100;
+const int INPUT_H = 125;
+const int INPUT_W = 256;
+const int INPUT_C = 7;
 
-const int FILTER_H = 3;
-const int FILTER_W = 3;
+const int FILTER_H = 17;
+const int FILTER_W = 11;
 
-const int PAD_H = 1;
-const int PAD_W = 1;
+const int PAD_H = 2;
+const int PAD_W = 4;
 
-const int STRIDE_H = 1;
-const int STRIDE_W = 1;
+const int STRIDE_H = 5;
+const int STRIDE_W = 2;
 
 const int OUTPUT_H = (INPUT_H-FILTER_H+2*PAD_H)/STRIDE_H + 1;
 const int OUTPUT_W = (INPUT_W-FILTER_W+2*PAD_W)/STRIDE_W + 1;
-const int OUTPUT_C = 3;
+const int OUTPUT_C = 5;
 
 
 int main(void) {

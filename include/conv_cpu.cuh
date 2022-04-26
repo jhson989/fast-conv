@@ -26,6 +26,7 @@ void conv_cpu(
     #endif
 
 
+    #pragma omp parallel for num_threads(6)
     for (int batch=0; batch<BATCH_NUM; batch++) {
         for (int out_c=0; out_c<OUTPUT_C; out_c++) {
             for (int out_h=0; out_h<OUTPUT_H; out_h++) {

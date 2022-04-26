@@ -66,7 +66,7 @@ __global__ void __kernel_conv_matmul(
         for (int k=0; k<K; k++) {
             sum += A[y*K + k] * B[batch*K*N + k*N + x];
         }
-        C[y*N+x] = sum;
+        C[batch*M*N + y*N+x] = sum;
     } 
 
 }
