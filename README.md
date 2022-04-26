@@ -17,8 +17,8 @@
 ## 2. How to Run
 - build
     - make DEBUG=OFF
-        - Skip a routine for checking computataion results
+        - Skip a routine for checking computation results
     - make DEBUG=ON
-        - Do a routine for checking computataion results
+        - Do a routine for checking computation results
 - execute
     - make run
